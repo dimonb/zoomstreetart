@@ -79,7 +79,7 @@ def find_posts(src: pathlib.Path) -> List[Tuple[str, PostGroup]]:
             continue
         posts.setdefault(key, {'meta': None, 'media': []})
         # sidecar?
-        if entry.name.endswith('.json') or entry.name.endswith('.json.xz'):
+        if (entry.name.endswith('.json') or entry.name.endswith('.json.xz')) and not entry.name.endswith('_comments.json'):
             posts[key]['meta'] = entry
         else:
             # любые медиа форматов из списков
@@ -275,6 +275,26 @@ def main() -> None:
                 except Exception:
                     caption_full = ''
 
+        # Determine instagram shortcode with fallback to raw meta JSON
+        shortcode = side.get('shortcode')
+        if not shortcode and data.get('meta'):
+            try:
+                meta_path = data.get('meta')
+                if isinstance(meta_path, pathlib.Path) and meta_path.exists():
+                    if meta_path.name.endswith('.xz'):
+                        with lzma.open(meta_path, 'rt', encoding='utf-8') as fh:
+                            raw = json.load(fh)
+                    else:
+                        with open(meta_path, 'r', encoding='utf-8') as fh:
+                            raw = json.load(fh)
+                    node = raw.get('node') if isinstance(raw, dict) else {}
+                    if isinstance(node, dict):
+                        shortcode = node.get('shortcode') or shortcode
+                    if not shortcode and isinstance(raw, dict):
+                        shortcode = raw.get('shortcode') or shortcode
+            except Exception:
+                pass
+
         front = {
             'title': title,
             'date': datestr,
@@ -284,7 +304,7 @@ def main() -> None:
             'author': args.author or None,
             'description': (clean_caption(caption_full)[:160] or None),
             'location': side.get('location') or None,
-            'instagram_url': (f"https://www.instagram.com/p/{side.get('shortcode')}/" if side.get('shortcode') else None)
+            'instagram_url': (f"https://www.instagram.com/p/{shortcode}/" if shortcode else None)
         }
         body = caption_full
         write_hugo_post(out, slug, front, body)
