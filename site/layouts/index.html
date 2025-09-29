@@ -1,0 +1,42 @@
+{{ define "main" }}
+<div class="homepage">
+    <div class="hero">
+        <h1>{{ .Title }}</h1>
+        <p>{{ .Content }}</p>
+    </div>
+
+    <section class="recent-posts">
+        <h2>All Posts</h2>
+        {{ $posts := where .Site.RegularPages "Type" "posts" }}
+        {{ $sorted := $posts.ByDate.Reverse }}
+        {{ if gt (len $sorted) 0 }}
+        <div class="post-grid">
+            {{ range $sorted }}
+            <a class="post-link" href="{{ .RelPermalink }}">
+                <article class="post-preview">
+                    {{ if .Params.images }}
+                    {{ $firstImage := index .Params.images 0 }}
+                    <div class="post-image">
+                        <img src="{{ $firstImage }}" alt="{{ .Title }}" loading="lazy">
+                    </div>
+                    {{ end }}
+                    <div class="post-content">
+                        <h3>{{ .Title }}</h3>
+                        <time datetime="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}">{{ .Date.Format "January 2, 2006" }}</time>
+                        {{ if .Params.description }}
+                        <p>{{ .Params.description }}</p>
+                        {{ end }}
+                        {{ if .Params.location }}
+                        <p class="location">📍 {{ .Params.location }}</p>
+                        {{ end }}
+                    </div>
+                </article>
+            </a>
+            {{ end }}
+        </div>
+        {{ else }}
+        <p>No posts yet. Check back soon!</p>
+        {{ end }}
+    </section>
+</div>
+{{ end }}

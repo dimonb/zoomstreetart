@@ -1,0 +1,38 @@
+{{ define "main" }}
+<div class="section-page">
+    <h1>{{ .Title }}</h1>
+    {{ if .Content }}
+    <div class="section-content">
+        {{ .Content }}
+    </div>
+    {{ end }}
+
+    {{ $pages := .Pages }}
+    {{ if $pages }}
+    <div class="posts-list">
+        {{ range .Pages.ByDate.Reverse }}
+        <article class="post-item">
+            {{ if .Params.images }}
+            {{ $firstImage := index .Params.images 0 }}
+            <div class="post-thumbnail">
+                <img src="{{ $firstImage }}" alt="{{ .Title }}" loading="lazy">
+            </div>
+            {{ end }}
+            <div class="post-info">
+                <h2><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
+                <time datetime="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}">{{ .Date.Format "January 2, 2006" }}</time>
+                {{ if .Params.description }}
+                <p>{{ .Params.description }}</p>
+                {{ end }}
+                {{ if .Params.location }}
+                <p class="location">📍 {{ .Params.location }}</p>
+                {{ end }}
+            </div>
+        </article>
+        {{ end }}
+    </div>
+    {{ else }}
+    <p>No posts in this section yet.</p>
+    {{ end }}
+</div>
+{{ end }}

@@ -1,0 +1,36 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Python packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Editor/IDE files
+.idea/
+.vscode/
+*.swp
+
+# Hugo build artifacts
+site/public/
+site/resources/
+site/.hugo_build.lock
+
+# Logs and caches
+*.log
+pytest_cache/
+.mypy_cache/
+.ruff_cache/
+site/content/posts
+zoomstreetart
+site/static/media
