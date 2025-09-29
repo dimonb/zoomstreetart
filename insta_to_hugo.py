@@ -132,6 +132,12 @@ def read_sidecar(meta_path: Optional[pathlib.Path]) -> dict:
         except (KeyError, IndexError, AttributeError, TypeError):
             caption = ''
 
+    shortcode = None
+    if node and isinstance(node, dict):
+        shortcode = node.get('shortcode') or None
+    if not shortcode and isinstance(data, dict):
+        shortcode = data.get('shortcode') or None
+
     # timestamp
     ts = data.get('taken_at_timestamp') or (node.get('taken_at_timestamp') if node else None)
     try:
@@ -143,7 +149,7 @@ def read_sidecar(meta_path: Optional[pathlib.Path]) -> dict:
     location = data.get('location') or (node.get('location') if node else {}) or {}
     loc_name = location.get('name') if isinstance(location, dict) else None
 
-    return {'caption': caption or '', 'timestamp': ts, 'location': loc_name}
+    return {'caption': caption or '', 'timestamp': ts, 'location': loc_name, 'shortcode': shortcode}
 
 def write_hugo_post(out_dir: pathlib.Path, slug: str, front: dict, body: str) -> None:
     content_dir = out_dir / 'content' / 'posts'
@@ -244,7 +250,8 @@ def main() -> None:
             'tags': ['instagram'],
             'author': args.author or None,
             'description': (side.get('caption') or '')[:160] or None,
-            'location': side.get('location') or None
+            'location': side.get('location') or None,
+            'instagram_url': (f"https://www.instagram.com/p/{side.get('shortcode')}/" if side.get('shortcode') else None)
         }
         body = side.get('caption') or ''
         write_hugo_post(out, slug, front, body)

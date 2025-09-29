@@ -1,14 +1,19 @@
 {{ define "main" }}
 <article class="post">
     <header class="post-header">
-        <h1>{{ .Title }}</h1>
-        <div class="post-meta">
-            <time datetime="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}">{{ .Date.Format "January 2, 2006" }}</time>
-            {{ if .Params.author }}
-            <span class="author">by {{ .Params.author }}</span>
+        <h1>
+            {{ if .Params.instagram_url }}
+            <a href="{{ .Params.instagram_url }}" target="_blank" rel="noopener noreferrer">{{ .Title }}</a>
+            {{ else }}
+            {{ .Title }}
             {{ end }}
+        </h1>
+        <div class="post-meta">
             {{ if .Params.location }}
             <span class="location">📍 {{ .Params.location }}</span>
+            {{ end }}
+            {{ if .Params.instagram_url }}
+            <a class="instagram-button" href="{{ .Params.instagram_url }}" target="_blank" rel="noopener noreferrer">Instagram</a>
             {{ end }}
         </div>
         {{ if .Params.tags }}

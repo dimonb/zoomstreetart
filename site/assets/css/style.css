@@ -227,7 +227,7 @@ main {
     box-shadow: 0 14px 32px rgba(1, 4, 9, 0.65);
 }
 
-/* Carousel styles */
+/* Carousel adjustments for dark theme */
 .carousel {
     position: relative;
     margin-bottom: 2rem;
@@ -254,9 +254,26 @@ main {
 .carousel-slide video {
     width: 100%;
     height: auto;
-    max-height: 70vh;
+    max-height: 80vh;
     object-fit: contain;
-    background: #000;
+    background: #0b0e14;
+}
+
+.carousel-control,
+.carousel-indicators {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+.carousel:hover .carousel-control,
+.carousel:hover .carousel-indicators,
+.carousel:focus-within .carousel-control,
+.carousel:focus-within .carousel-indicators,
+.carousel-control:focus,
+.carousel-indicators button:focus {
+    opacity: 1;
+    pointer-events: auto;
 }
 
 .carousel-control {
@@ -326,6 +343,17 @@ main {
     margin-bottom: 1rem;
 }
 
+.post-header h1 a {
+    color: #f0f6fc;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.post-header h1 a:hover,
+.post-header h1 a:focus {
+    color: #79c0ff;
+}
+
 .post-meta {
     display: flex;
     gap: 1rem;
@@ -369,6 +397,25 @@ main {
 
 .post-content {
     line-height: 1.8;
+}
+
+.instagram-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #e95950;
+    color: #fff;
+    padding: 0.4rem 0.9rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.instagram-button:hover,
+.instagram-button:focus {
+    background: #f77f76;
+    transform: translateY(-1px);
 }
 
 /* Footer */
