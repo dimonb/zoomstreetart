@@ -9,6 +9,8 @@ download:
 	instaloader --login $(USER) $(PROFILE)
 
 build:
+	rm -rf $(HUGO_DIR)/content/posts/*
+	rm -rf $(HUGO_DIR)/static/media/*
 	. $(VENV)/bin/activate && \
 	python insta_to_hugo.py --src ./$(PROFILE) --out ./$(HUGO_DIR) --author "Zoom Street Art"
 	cd $(HUGO_DIR) && hugo --minify

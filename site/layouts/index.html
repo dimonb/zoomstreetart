@@ -1,12 +1,6 @@
 {{ define "main" }}
 <div class="homepage">
-    <div class="hero">
-        <h1>{{ .Title }}</h1>
-        <p>{{ .Content }}</p>
-    </div>
-
     <section class="recent-posts">
-        <h2>All Posts</h2>
         {{ $posts := where .Site.RegularPages "Type" "posts" }}
         {{ $sorted := $posts.ByDate.Reverse }}
         {{ if gt (len $sorted) 0 }}

@@ -8,27 +8,19 @@
             {{ .Title }}
             {{ end }}
         </h1>
+        {{ if .Params.location }}
         <div class="post-meta">
-            {{ if .Params.location }}
             <span class="location">📍 {{ .Params.location }}</span>
-            {{ end }}
-            {{ if .Params.instagram_url }}
-            <a class="instagram-button" href="{{ .Params.instagram_url }}" target="_blank" rel="noopener noreferrer">Instagram</a>
-            {{ end }}
-        </div>
-        {{ if .Params.tags }}
-        <div class="tags">
-            {{ range .Params.tags }}
-            <span class="tag">{{ . }}</span>
-            {{ end }}
         </div>
         {{ end }}
     </header>
 
-    {{ if .Params.images }}
+    {{ $mediaList := .Params.images }}
+    {{ if $mediaList }}
+    {{ $mediaCount := len $mediaList }}
     <div class="carousel" data-carousel>
         <div class="carousel-track" data-carousel-track>
-            {{ range $index, $media := .Params.images }}
+            {{ range $index, $media := $mediaList }}
             <div class="carousel-slide" data-carousel-slide>
                 {{ $ext := lower (path.Ext $media) }}
                 {{ if or (eq $ext ".mp4") (eq $ext ".webm") (eq $ext ".mov") }}
@@ -50,13 +42,15 @@
             </div>
             {{ end }}
         </div>
+        {{ if gt $mediaCount 1 }}
         <button class="carousel-control prev" data-carousel-prev aria-label="Previous slide">&#10094;</button>
         <button class="carousel-control next" data-carousel-next aria-label="Next slide">&#10095;</button>
         <div class="carousel-indicators" data-carousel-indicators>
-            {{ range $index, $_ := .Params.images }}
+            {{ range $index, $_ := $mediaList }}
             <button data-carousel-indicator aria-label="Go to slide {{ add $index 1 }}" {{ if eq $index 0 }}class="active"{{ end }}></button>
             {{ end }}
         </div>
+        {{ end }}
     </div>
     {{ end }}
 

@@ -21,13 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
             indicators.forEach((indicator, index) => {
                 indicator.classList.toggle('active', index === currentIndex);
             });
-
-            if (prevButton) {
-                prevButton.disabled = slides.length <= 1;
-            }
-            if (nextButton) {
-                nextButton.disabled = slides.length <= 1;
-            }
         };
 
         const goToSlide = (index) => {
@@ -41,13 +34,10 @@ document.addEventListener('DOMContentLoaded', () => {
             updateCarousel();
         };
 
-        if (prevButton) {
+        if (prevButton && nextButton) {
             prevButton.addEventListener('click', () => {
                 goToSlide(currentIndex - 1);
             });
-        }
-
-        if (nextButton) {
             nextButton.addEventListener('click', () => {
                 goToSlide(currentIndex + 1);
             });
@@ -62,17 +52,19 @@ document.addEventListener('DOMContentLoaded', () => {
         // Initialize
         updateCarousel();
 
-        // Keyboard navigation
-        carousel.addEventListener('keydown', (event) => {
-            if (event.key === 'ArrowLeft') {
-                event.preventDefault();
-                goToSlide(currentIndex - 1);
-            }
-            if (event.key === 'ArrowRight') {
-                event.preventDefault();
-                goToSlide(currentIndex + 1);
-            }
-        });
+        // Keyboard navigation (only when controls exist)
+        if (prevButton && nextButton) {
+            carousel.addEventListener('keydown', (event) => {
+                if (event.key === 'ArrowLeft') {
+                    event.preventDefault();
+                    goToSlide(currentIndex - 1);
+                }
+                if (event.key === 'ArrowRight') {
+                    event.preventDefault();
+                    goToSlide(currentIndex + 1);
+                }
+            });
+        }
 
         // Allow focusable carousel for keyboard navigation
         carousel.setAttribute('tabindex', '0');

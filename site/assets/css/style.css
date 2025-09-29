@@ -57,25 +57,17 @@ main {
 }
 
 /* Homepage */
-.hero {
-    text-align: center;
-    padding: 3rem 0;
-    background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
-    color: #f8fafc;
-    margin-bottom: 3rem;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.45);
+.homepage {
+    padding-top: 1rem;
 }
 
-.hero h1 {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
+.recent-posts {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
 }
 
-.hero p {
-    font-size: 1.2rem;
-    opacity: 0.85;
-}
+/* Hero styles removed */
 
 /* Post grid */
 .post-grid {
@@ -355,30 +347,12 @@ main {
 }
 
 .post-meta {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-    margin-bottom: 1rem;
+    margin-top: 0.5rem;
     color: #8b949e;
 }
 
-.author, .location {
-    color: #9ca3af;
-    font-size: 0.9rem;
-}
-
 .tags {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-}
-
-.tag {
-    background: #1f6feb;
-    color: #f8fafc;
-    padding: 0.25rem 0.75rem;
-    border-radius: 999px;
-    font-size: 0.8rem;
+    display: none;
 }
 
 .post-images {
