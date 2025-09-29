@@ -132,6 +132,13 @@ def read_sidecar(meta_path: Optional[pathlib.Path]) -> dict:
         except (KeyError, IndexError, AttributeError, TypeError):
             caption = ''
 
+    # Fallback to adjacent .txt if caption still empty
+    if not caption and meta_path:
+        base = strip_sidecar_suffixes(meta_path)
+        txt_path = meta_path.with_name(base + '.txt')
+        if txt_path.exists():
+            caption = txt_path.read_text(encoding='utf-8', errors='ignore')
+
     shortcode = None
     if node and isinstance(node, dict):
         shortcode = node.get('shortcode') or None
@@ -204,6 +211,13 @@ def clean_caption(caption: str) -> str:
 
     return '\n'.join(cleaned_lines)
 
+# Quote characters commonly used in captions
+QUOTE_CHARS = '"\'«»“”„‟‹›❝❞❮❯'
+
+
+def clean_title(text: str) -> str:
+    return text.strip()
+
 def copy_media_files(media_list: Sequence[pathlib.Path], out_dir: pathlib.Path) -> List[str]:
     media_out = out_dir / 'static' / 'media'
     media_out.mkdir(parents=True, exist_ok=True)
@@ -239,8 +253,27 @@ def main() -> None:
         except ValueError:
             dt = datetime.utcnow()
         datestr = dt.strftime('%Y-%m-%dT%H:%M:%S')
-        title = (side.get('caption') or '').split('\n',1)[0][:60] or key
+        title_src = (side.get('caption') or '').split('\n', 1)[0]
+        if not title_src:
+            txt_fallback = (src / f"{key}.txt")
+            if txt_fallback.exists():
+                try:
+                    title_src = txt_fallback.read_text(encoding='utf-8', errors='ignore').split('\n', 1)[0]
+                except Exception:
+                    title_src = ''
+        title_clean = clean_title(title_src) if title_src else ''
+        title = title_clean[:60] or key
         slug = dt.strftime('%Y%m%d') + '-' + slugify(title)
+
+        # Caption full text with fallback to .txt
+        caption_full = side.get('caption') or ''
+        if not caption_full:
+            txt_fallback = (src / f"{key}.txt")
+            if txt_fallback.exists():
+                try:
+                    caption_full = txt_fallback.read_text(encoding='utf-8', errors='ignore')
+                except Exception:
+                    caption_full = ''
 
         front = {
             'title': title,
@@ -249,11 +282,11 @@ def main() -> None:
             'images': images,
             'tags': ['instagram'],
             'author': args.author or None,
-            'description': (side.get('caption') or '')[:160] or None,
+            'description': (clean_caption(caption_full)[:160] or None),
             'location': side.get('location') or None,
             'instagram_url': (f"https://www.instagram.com/p/{side.get('shortcode')}/" if side.get('shortcode') else None)
         }
-        body = side.get('caption') or ''
+        body = caption_full
         write_hugo_post(out, slug, front, body)
         count += 1
 
