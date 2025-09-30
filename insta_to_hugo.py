@@ -319,7 +319,7 @@ def main() -> None:
             'tags': ['instagram'],
             'author': args.author or None,
             'description': (clean_caption(caption_full)[:160] or None),
-            'location': side.get('location') or None,
+            # 'location' removed to avoid geotags in posts
             'instagram_url': (f"https://www.instagram.com/p/{shortcode}/" if shortcode else None)
         }
         body = caption_full
