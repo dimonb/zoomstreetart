@@ -19,15 +19,25 @@ import hashlib
 from typing import TypedDict, Optional, List, Sequence, Dict, Tuple
 from datetime import datetime
 
+try:
+    from unidecode import unidecode
+except ImportError:
+    unidecode = None
+
 IMAGE_EXT = {'.jpg', '.jpeg', '.png', '.webp'}
 VIDEO_EXT = {'.mp4', '.mov', '.webm'}
 
 UTC_KEY_RE = re.compile(r'(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}_UTC)')
 
 def slugify(s: str) -> str:
+    # Transliterate to ASCII if unidecode is available
+    if unidecode:
+        s = unidecode(s)
     s = s.lower()
     s = re.sub(r'[^a-z0-9\-_ \.]+', '', s)
     s = re.sub(r'\s+', '-', s).strip('-')
+    # Remove only leading/trailing dots
+    s = s.strip('.')
     return s or 'post'
 
 def strip_sidecar_suffixes(p: pathlib.Path) -> str:
@@ -198,10 +208,6 @@ def clean_caption(caption: str) -> str:
             cleaned_lines.append(line)
 
     return '\n'.join(cleaned_lines)
-
-# Quote characters commonly used in captions
-QUOTE_CHARS = '"\'«»“”„‟‹›❝❞❮❯'
-
 
 def clean_title(text: str) -> str:
     return text.strip()
