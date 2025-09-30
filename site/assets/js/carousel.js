@@ -69,4 +69,19 @@ document.addEventListener('DOMContentLoaded', () => {
         // Allow focusable carousel for keyboard navigation
         carousel.setAttribute('tabindex', '0');
     });
+
+    // Header shrink on scroll
+    const header = document.querySelector('header');
+    let lastScrollY = window.scrollY;
+    const onScroll = () => {
+        const y = window.scrollY;
+        if (y > 10) {
+            header && header.classList.add('shrink');
+        } else {
+            header && header.classList.remove('shrink');
+        }
+        lastScrollY = y;
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
 });

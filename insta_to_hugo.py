@@ -89,10 +89,7 @@ def find_posts(src: pathlib.Path) -> List[Tuple[str, PostGroup]]:
 
     def parse_dt(key: str) -> datetime:
         # key e.g. 2025-09-01_12-00-00_UTC
-        try:
-            return datetime.strptime(key.replace('_UTC',''), '%Y-%m-%d_%H-%M-%S')
-        except ValueError:
-            return datetime.min
+        return datetime.strptime(key.replace('_UTC',''), '%Y-%m-%d_%H-%M-%S')
 
     items: List[Tuple[str, PostGroup]] = list(posts.items())
     items.sort(key=lambda kv: parse_dt(kv[0]), reverse=True)
@@ -104,15 +101,12 @@ def read_sidecar(meta_path: Optional[pathlib.Path]) -> dict:
     """
     if not meta_path or not meta_path.exists():
         return {}
-    try:
-        if meta_path.name.endswith('.xz'):
-            f = lzma.open(meta_path, 'rt', encoding='utf-8')
-        else:
-            f = open(meta_path, 'r', encoding='utf-8')
-        with f as fh:
-            data = json.load(fh)
-    except (OSError, lzma.LZMAError, json.JSONDecodeError, UnicodeDecodeError):
-        return {}
+    if meta_path.name.endswith('.xz'):
+        f = lzma.open(meta_path, 'rt', encoding='utf-8')
+    else:
+        f = open(meta_path, 'r', encoding='utf-8')
+    with f as fh:
+        data = json.load(fh)
 
     if isinstance(data, list):
         data = next((item for item in data if isinstance(item, dict)), {})
@@ -127,10 +121,7 @@ def read_sidecar(meta_path: Optional[pathlib.Path]) -> dict:
         if edges and edges[0].get('node', {}).get('text'):
             caption = edges[0]['node']['text']
     if not caption:
-        try:
-            caption = data.get('caption') or data.get('edge_media_to_caption', {}).get('edges', [{}])[0].get('node', {}).get('text', '')
-        except (KeyError, IndexError, AttributeError, TypeError):
-            caption = ''
+        caption = data.get('caption') or data.get('edge_media_to_caption', {}).get('edges', [{}])[0].get('node', {}).get('text', '')
 
     # Fallback to adjacent .txt if caption still empty
     if not caption and meta_path:
@@ -147,10 +138,7 @@ def read_sidecar(meta_path: Optional[pathlib.Path]) -> dict:
 
     # timestamp
     ts = data.get('taken_at_timestamp') or (node.get('taken_at_timestamp') if node else None)
-    try:
-        ts = int(ts) if ts is not None else None
-    except (TypeError, ValueError):
-        ts = None
+    ts = int(ts) if ts is not None else None
 
     # location
     location = data.get('location') or (node.get('location') if node else {}) or {}
@@ -194,7 +182,6 @@ def clean_caption(caption: str) -> str:
             continue
 
         # Remove excessive hashtags (more than 3 in a row)
-        import re
         hashtag_count = len(re.findall(r'#\w+', line))
         if hashtag_count > 3:
             # Keep only first 3 hashtags
@@ -247,20 +234,13 @@ def main() -> None:
         side = read_sidecar(data.get('meta'))
         images = copy_media_files(media_paths, out)
 
-        # date & slug
-        try:
-            dt = datetime.strptime(key.replace('_UTC',''), '%Y-%m-%d_%H-%M-%S')
-        except ValueError:
-            dt = datetime.utcnow()
+        dt = datetime.strptime(key.replace('_UTC',''), '%Y-%m-%d_%H-%M-%S')
         datestr = dt.strftime('%Y-%m-%dT%H:%M:%S')
         title_src = (side.get('caption') or '').split('\n', 1)[0]
         if not title_src:
             txt_fallback = (src / f"{key}.txt")
             if txt_fallback.exists():
-                try:
-                    title_src = txt_fallback.read_text(encoding='utf-8', errors='ignore').split('\n', 1)[0]
-                except Exception:
-                    title_src = ''
+                title_src = txt_fallback.read_text(encoding='utf-8', errors='ignore').split('\n', 1)[0]
         title_clean = clean_title(title_src) if title_src else ''
         title = title_clean[:60] or key
         slug = dt.strftime('%Y%m%d') + '-' + slugify(title)
@@ -270,30 +250,24 @@ def main() -> None:
         if not caption_full:
             txt_fallback = (src / f"{key}.txt")
             if txt_fallback.exists():
-                try:
-                    caption_full = txt_fallback.read_text(encoding='utf-8', errors='ignore')
-                except Exception:
-                    caption_full = ''
+                caption_full = txt_fallback.read_text(encoding='utf-8', errors='ignore')
 
         # Determine instagram shortcode with fallback to raw meta JSON
         shortcode = side.get('shortcode')
         if not shortcode and data.get('meta'):
-            try:
-                meta_path = data.get('meta')
-                if isinstance(meta_path, pathlib.Path) and meta_path.exists():
-                    if meta_path.name.endswith('.xz'):
-                        with lzma.open(meta_path, 'rt', encoding='utf-8') as fh:
-                            raw = json.load(fh)
-                    else:
-                        with open(meta_path, 'r', encoding='utf-8') as fh:
-                            raw = json.load(fh)
-                    node = raw.get('node') if isinstance(raw, dict) else {}
-                    if isinstance(node, dict):
-                        shortcode = node.get('shortcode') or shortcode
-                    if not shortcode and isinstance(raw, dict):
-                        shortcode = raw.get('shortcode') or shortcode
-            except Exception:
-                pass
+            meta_path = data.get('meta')
+            if isinstance(meta_path, pathlib.Path) and meta_path.exists():
+                if meta_path.name.endswith('.xz'):
+                    with lzma.open(meta_path, 'rt', encoding='utf-8') as fh:
+                        raw = json.load(fh)
+                else:
+                    with open(meta_path, 'r', encoding='utf-8') as fh:
+                        raw = json.load(fh)
+                node = raw.get('node') if isinstance(raw, dict) else {}
+                if isinstance(node, dict):
+                    shortcode = node.get('shortcode') or shortcode
+                if not shortcode and isinstance(raw, dict):
+                    shortcode = raw.get('shortcode') or shortcode
 
         front = {
             'title': title,
