@@ -105,15 +105,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Header shrink on scroll
     const header = document.querySelector('header');
-    let lastScrollY = window.scrollY;
+    let suppressScrollHandler = false;
+    const applyShrink = (shrink) => {
+        if (!header) return;
+        if (shrink) header.classList.add('shrink');
+        else header.classList.remove('shrink');
+    };
+
     const onScroll = () => {
+        if (suppressScrollHandler) return;
         const y = window.scrollY;
-        if (y > 10) {
-            header && header.classList.add('shrink');
-        } else {
-            header && header.classList.remove('shrink');
-        }
-        lastScrollY = y;
+        applyShrink(y > 10);
+        // persist for back/forward restoration
+        try {
+            sessionStorage.setItem('homeHeaderShrink', y > 10 ? '1' : '0');
+        } catch (_) {}
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
@@ -124,21 +130,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const restoreHomeScroll = () => {
         try {
             const y = sessionStorage.getItem('homeScrollY');
-            if (y) {
-                window.history.scrollRestoration = 'manual';
-                // Restore after layout
+            const shrink = sessionStorage.getItem('homeHeaderShrink') === '1';
+            // Apply header state before scrolling to avoid jump
+            applyShrink(shrink);
+            window.history.scrollRestoration = 'manual';
+            suppressScrollHandler = true;
+            // Mark restoring to suppress transitions/flicker
+            document.documentElement.classList.add('restoring');
+            // Restore after layout
+            requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
-                    requestAnimationFrame(() => {
-                        window.scrollTo(0, parseInt(y, 10));
-                    });
+                    window.scrollTo(0, y ? parseInt(y, 10) : 0);
+                    // Wait a tick then re-enable handler and clear restoring
+                    setTimeout(() => {
+                        suppressScrollHandler = false;
+                        document.documentElement.classList.remove('restoring');
+                    }, 80);
                 });
-            }
+            });
         } catch (_) {}
     };
 
     const saveHomeScroll = () => {
         try {
             sessionStorage.setItem('homeScrollY', String(window.scrollY));
+            sessionStorage.setItem('homeHeaderShrink', header?.classList.contains('shrink') ? '1' : '0');
         } catch (_) {}
     };
 

@@ -499,3 +499,11 @@ footer {
         height: 0.48rem;
     }
 }
+
+/* During restoration suppress transitions and hide content to prevent flicker */
+html.restoring header {
+    transition: none !important;
+}
+html.restoring main {
+    visibility: hidden;
+}
