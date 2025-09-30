@@ -323,8 +323,8 @@ main {
 }
 
 .carousel-indicators button {
-    width: 0.75rem;
-    height: 0.75rem;
+    width: 0.52rem;
+    height: 0.52rem;
     border-radius: 50%;
     border: none;
     background: rgba(148, 163, 184, 0.45);
@@ -495,7 +495,7 @@ footer {
     }
 
     .carousel-indicators button {
-        width: 0.7rem;
-        height: 0.7rem;
+        width: 0.48rem;
+        height: 0.48rem;
     }
 }

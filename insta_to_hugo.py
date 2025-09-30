@@ -72,13 +72,17 @@ def markdown_escape(text: str) -> str:
     """
     Escape minimal set of Markdown characters in content to prevent unintended formatting.
     - Escapes backslash, asterisks, underscores, backticks, brackets, parentheses, hashes and exclamation.
-    - Also escapes leading list/heading markers at line start.
+    - Escapes leading heading/quote/list markers at line start (except '*', since asterisks are escaped inline).
+    - Forces hard line breaks by joining lines with "  \n".
     """
     escaped_lines: list[str] = []
     for raw_line in (text or '').split('\n'):
         line = raw_line
-        # Escape leading markdown markers
-        if line.startswith(('#', '>', '-', '+', '*')):
+        # Escape leading markdown markers (avoid double-escaping first '*')
+        if line.startswith(('#', '>', '-', '+')):
+            line = '\\' + line
+        # Escape ordered list like "1. " at the start
+        if re.match(r'^\d+\.\s', line):
             line = '\\' + line
         # Inline escapes (order matters: backslash first)
         line = line.replace('\\', '\\\\')
@@ -90,7 +94,8 @@ def markdown_escape(text: str) -> str:
         line = line.replace('#', '\\#')
         line = line.replace('!', '\\!')
         escaped_lines.append(line)
-    return '\n'.join(escaped_lines)
+    # Force hard line breaks between lines
+    return '  \n'.join(escaped_lines)
 
 class PostGroup(TypedDict):
     meta: Optional[pathlib.Path]
