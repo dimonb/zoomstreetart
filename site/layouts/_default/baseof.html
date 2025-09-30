@@ -9,13 +9,13 @@
     {{ with .OutputFormats.Get "RSS" }}
     <link href="{{ .RelPermalink }}" rel="alternate" type="application/rss+xml" title="{{ $.Site.Title }}">
     {{ end }}
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-4THM4W42MP"></script>
+    <!-- Google tag (gtag.js) via custom collector -->
+    <script async src="https://c.zoomstreet.art/gtag/js?id=G-4THM4W42MP"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);} 
       gtag('js', new Date());
-      gtag('config', 'G-4THM4W42MP');
+      gtag('config', 'G-4THM4W42MP', { transport_url: 'https://c.zoomstreet.art' });
     </script>
     <!-- Plausible analytics -->
     <script defer data-domain="zoomstreet.art" src="https://pl.dimonb.com/js/script.file-downloads.hash.outbound-links.pageview-props.tagged-events.js"></script>

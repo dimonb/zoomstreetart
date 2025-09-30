@@ -1,0 +1,14 @@
+name = "ga-firstparty-proxy"
+main = "src/worker.js"
+compatibility_date = "2024-11-10"
+
+routes = [
+  { pattern = "c.zoomstreet.art/*", zone_name = "zoomstreet.art" }
+]
+
+# Чтобы видеть реальные IP в логах Google (через XFF/CF)
+[vars]
+FORCE_REGION1 = "1"  # фиксируем region1 для g/collect
+ALLOW_ORIGINS = "https://zoomstreet.art,https://www.zoomstreet.art"
+COOKIE_DOMAIN = ".zoomstreet.art"
+FPID_COOKIE = "fpid"   # имя first-party id
