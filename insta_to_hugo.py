@@ -67,6 +67,31 @@ def yaml_escape(value: str) -> str:
     s = s.replace('"', '\\"')
     return s
 
+
+def markdown_escape(text: str) -> str:
+    """
+    Escape minimal set of Markdown characters in content to prevent unintended formatting.
+    - Escapes backslash, asterisks, underscores, backticks, brackets, parentheses, hashes and exclamation.
+    - Also escapes leading list/heading markers at line start.
+    """
+    escaped_lines: list[str] = []
+    for raw_line in (text or '').split('\n'):
+        line = raw_line
+        # Escape leading markdown markers
+        if line.startswith(('#', '>', '-', '+', '*')):
+            line = '\\' + line
+        # Inline escapes (order matters: backslash first)
+        line = line.replace('\\', '\\\\')
+        line = line.replace('*', '\\*')
+        line = line.replace('_', '\\_')
+        line = line.replace('`', '\\`')
+        line = line.replace('[', '\\[').replace(']', '\\]')
+        line = line.replace('(', '\\(').replace(')', '\\)')
+        line = line.replace('#', '\\#')
+        line = line.replace('!', '\\!')
+        escaped_lines.append(line)
+    return '\n'.join(escaped_lines)
+
 class PostGroup(TypedDict):
     meta: Optional[pathlib.Path]
     media: List[pathlib.Path]
@@ -172,7 +197,7 @@ def write_hugo_post(out_dir: pathlib.Path, slug: str, front: dict, body: str) ->
             fm.append(f'{k}: "{yaml_escape(str(v))}"')
     fm.append('---\n')
 
-    body_content = clean_caption(body or '')
+    body_content = markdown_escape(clean_caption(body or ''))
     content = body_content + '\n' if body_content else ''
     path.write_text('\n'.join(fm) + content, encoding='utf-8')
 
