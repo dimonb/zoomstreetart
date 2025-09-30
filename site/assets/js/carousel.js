@@ -117,4 +117,45 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
+
+    // Preserve homepage scroll position when navigating to a post and back
+    const isHome = location.pathname === '/' || location.pathname === '/index.html';
+
+    const restoreHomeScroll = () => {
+        try {
+            const y = sessionStorage.getItem('homeScrollY');
+            if (y) {
+                window.history.scrollRestoration = 'manual';
+                // Restore after layout
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        window.scrollTo(0, parseInt(y, 10));
+                    });
+                });
+            }
+        } catch (_) {}
+    };
+
+    const saveHomeScroll = () => {
+        try {
+            sessionStorage.setItem('homeScrollY', String(window.scrollY));
+        } catch (_) {}
+    };
+
+    if (isHome) {
+        restoreHomeScroll();
+        // Save on clicking any post card link
+        document.querySelectorAll('a.post-link').forEach((a) => {
+            a.addEventListener('click', saveHomeScroll, { passive: true });
+        });
+        // Save on unload/back-forward cache
+        window.addEventListener('beforeunload', saveHomeScroll);
+        window.addEventListener('pagehide', saveHomeScroll);
+        // Restore also on pageshow (including bfcache restore)
+        window.addEventListener('pageshow', (e) => {
+            if (e.persisted || performance.getEntriesByType('navigation')[0]?.type === 'back_forward') {
+                restoreHomeScroll();
+            }
+        });
+    }
 });
