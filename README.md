@@ -73,3 +73,14 @@ poe format
 - **Unidecode** для транслитерации
 - **Instaloader** для выгрузки Instagram
 - **Poethepoet** для автоматизации задач
+
+## CI/CD — GitHub Pages
+
+Репозиторий содержит workflow `.github/workflows/deploy.yml`, который:
+- Собирает сайт на каждом пуше в ветку `main`
+- Генерирует контент (`insta_to_hugo.py`) и собирает Hugo (`site/public`)
+- Публикует на GitHub Pages через `actions/deploy-pages`
+
+Настройка в репозитории GitHub:
+1. Settings → Pages → Build and Deployment: Source = GitHub Actions
+2. Settings → Pages → Custom domain (опционально)
