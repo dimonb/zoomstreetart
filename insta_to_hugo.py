@@ -243,7 +243,12 @@ def main() -> None:
                 title_src = txt_fallback.read_text(encoding='utf-8', errors='ignore').split('\n', 1)[0]
         title_clean = clean_title(title_src) if title_src else ''
         title = title_clean[:60] or key
-        slug = dt.strftime('%Y%m%d') + '-' + slugify(title)
+        
+        slug_suffix = slugify(title)
+        # If slugify returns empty or generic 'post', use key to ensure uniqueness
+        if not slug_suffix or slug_suffix == 'post':
+            slug_suffix = key
+        slug = dt.strftime('%Y%m%d') + '-' + slug_suffix
 
         # Caption full text with fallback to .txt
         caption_full = side.get('caption') or ''
