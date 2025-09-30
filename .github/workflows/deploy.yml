@@ -40,8 +40,22 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install poetry
 
+      - name: Cache Poetry env and pip
+        uses: actions/cache@v4
+        with:
+          path: |
+            .venv
+            ~/.cache/pip
+            ~/.cache/pypoetry
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock', '**/pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+
       - name: Install dependencies with Poetry (main only)
+        env:
+          POETRY_VIRTUALENVS_IN_PROJECT: "true"
         run: |
+          poetry config virtualenvs.in-project true
           poetry install --no-interaction --no-ansi --only main --no-root
 
       - name: Generate content
