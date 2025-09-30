@@ -1,0 +1,53 @@
+[project]
+name = "zoomstreetart"
+version = "0.1.0"
+description = "Instagram to Hugo static site generator for Zoom Street Art gallery"
+authors = [
+    {name = "Dmitrii", email = "dimonb@example.com"}
+]
+requires-python = ">=3.10"
+dependencies = [
+    "unidecode>=1.4.0",
+    "instaloader>=4.10.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.1.0",
+    "poethepoet>=0.24.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "ANN", "S", "B", "A", "C4", "RET", "SIM"]
+ignore = ["ANN101", "ANN102", "S101"]
+
+[tool.poe.tasks]
+download = {shell = "instaloader --login $USER zoomstreetart"}
+generate = {cmd = "python insta_to_hugo.py --src ./zoomstreetart --out ./site --author 'Zoom Street Art'"}
+hugo-build = {cmd = "hugo --minify", cwd = "site"}
+clean = {shell = "rm -rf site/content/posts/* site/static/media/*"}
+
+[tool.poe.tasks.build]
+sequence = ["clean", "generate", "hugo-build"]
+help = "Clean, generate posts from Instagram data, and build Hugo site"
+
+[tool.poe.tasks.serve]
+cmd = "hugo server -D"
+cwd = "site"
+help = "Start Hugo development server"
+
+[tool.poe.tasks.lint]
+cmd = "ruff check ."
+help = "Run linter on Python files"
+
+[tool.poe.tasks.format]
+cmd = "ruff format ."
+help = "Format Python files with ruff"

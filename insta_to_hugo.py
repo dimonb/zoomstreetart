@@ -9,20 +9,18 @@ insta_to_hugo.py
 Пример:
   python insta_to_hugo.py --src /path/to/instaloader/profile --out /path/to/hugo/site --author "Dmitrii"
 """
+
 import argparse
-import pathlib
-import shutil
-import re
+import hashlib
 import json
 import lzma
-import hashlib
-from typing import TypedDict, Optional, List, Sequence, Dict, Tuple
+import pathlib
+import re
+import shutil
 from datetime import datetime
+from typing import Dict, List, Optional, Sequence, Tuple, TypedDict
 
-try:
-    from unidecode import unidecode
-except ImportError:
-    unidecode = None
+from unidecode import unidecode
 
 IMAGE_EXT = {'.jpg', '.jpeg', '.png', '.webp'}
 VIDEO_EXT = {'.mp4', '.mov', '.webm'}
@@ -31,8 +29,7 @@ UTC_KEY_RE = re.compile(r'(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}_UTC)')
 
 def slugify(s: str) -> str:
     # Transliterate to ASCII if unidecode is available
-    if unidecode:
-        s = unidecode(s)
+    s = unidecode(s)
     s = s.lower()
     s = re.sub(r'[^a-z0-9\-_ \.]+', '', s)
     s = re.sub(r'\s+', '-', s).strip('-')
