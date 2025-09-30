@@ -422,6 +422,30 @@ footer {
         padding: 1rem;
     }
 
+    /* Full-width posts on mobile */
+    article.post {
+        padding: 0;
+        border-radius: 0;
+        box-shadow: none;
+        background: #0d1117;
+    }
+
+    article.post .post-header {
+        padding: 1rem 1.5rem;
+        background: #161b22;
+    }
+
+    article.post .post-content {
+        padding: 1rem 1.5rem;
+    }
+
+    /* Full-width carousel on mobile */
+    .carousel {
+        margin-bottom: 0;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
     header {
         padding: 1rem 1.5rem;
     }
@@ -460,13 +484,18 @@ footer {
         grid-template-columns: 1fr;
     }
 
+    /* Hide navigation buttons on mobile, show only indicators */
     .carousel-control {
-        padding: 0.5rem 0.75rem;
-        font-size: 1.25rem;
+        display: none;
+    }
+
+    .carousel-indicators {
+        opacity: 1;
+        pointer-events: auto;
     }
 
     .carousel-indicators button {
-        width: 0.6rem;
-        height: 0.6rem;
+        width: 0.7rem;
+        height: 0.7rem;
     }
 }
