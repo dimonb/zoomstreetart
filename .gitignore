@@ -32,5 +32,4 @@ pytest_cache/
 .mypy_cache/
 .ruff_cache/
 site/content/posts
-zoomstreetart
 site/static/media
