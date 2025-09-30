@@ -1,6 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
     const carousels = document.querySelectorAll('[data-carousel]');
 
+    // Keep references to carousel controllers
+    const controllers = [];
+
     carousels.forEach((carousel) => {
         const track = carousel.querySelector('[data-carousel-track]');
         const slides = Array.from(carousel.querySelectorAll('[data-carousel-slide]'));
@@ -34,6 +37,8 @@ document.addEventListener('DOMContentLoaded', () => {
             updateCarousel();
         };
 
+        controllers.push({ el: carousel, goToSlide, getIndex: () => currentIndex, count: slides.length });
+
         if (prevButton && nextButton) {
             prevButton.addEventListener('click', () => {
                 goToSlide(currentIndex - 1);
@@ -52,9 +57,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // Initialize
         updateCarousel();
 
-        // Keyboard navigation (only when controls exist)
+        // Keyboard navigation (legacy: when carousel is focused)
         if (prevButton && nextButton) {
             carousel.addEventListener('keydown', (event) => {
+                // React only to arrow keys without modifiers
+                if (event.metaKey || event.ctrlKey || event.altKey) return;
                 if (event.key === 'ArrowLeft') {
                     event.preventDefault();
                     goToSlide(currentIndex - 1);
@@ -102,6 +109,37 @@ document.addEventListener('DOMContentLoaded', () => {
             handleSwipe();
         }, { passive: true });
     });
+
+    // Global keyboard navigation without focusing carousel
+    const getActiveController = () => {
+        // Prefer the carousel most in view (top closest to viewport center)
+        let best = null;
+        let bestScore = Infinity;
+        const viewportCenter = window.scrollY + window.innerHeight / 2;
+        controllers.forEach((c) => {
+            const rect = c.el.getBoundingClientRect();
+            const center = window.scrollY + rect.top + rect.height / 2;
+            const score = Math.abs(center - viewportCenter);
+            if (score < bestScore) {
+                best = c; bestScore = score;
+            }
+        });
+        return best;
+    };
+
+    document.addEventListener('keydown', (event) => {
+        // Only react to pure ArrowLeft/ArrowRight (no modifiers)
+        if (event.metaKey || event.ctrlKey || event.altKey) return;
+        if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+        // Ignore when typing in inputs/textareas/contenteditable
+        const target = event.target;
+        if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return;
+        const ctrl = getActiveController();
+        if (!ctrl || ctrl.count <= 1) return;
+        event.preventDefault();
+        if (event.key === 'ArrowLeft') ctrl.goToSlide(ctrl.getIndex() - 1);
+        else ctrl.goToSlide(ctrl.getIndex() + 1);
+    }, { passive: false });
 
     // Header shrink on scroll
     const header = document.querySelector('header');
