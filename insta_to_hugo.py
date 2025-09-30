@@ -15,6 +15,7 @@ import shutil
 import re
 import json
 import lzma
+import hashlib
 from typing import TypedDict, Optional, List, Sequence, Dict, Tuple
 from datetime import datetime
 
@@ -247,8 +248,11 @@ def main() -> None:
         slug_suffix = slugify(title)
         # If slugify returns empty or generic 'post', use key to ensure uniqueness
         if not slug_suffix or slug_suffix == 'post':
-            slug_suffix = key
-        slug = dt.strftime('%Y%m%d') + '-' + slug_suffix
+            slug_suffix = 'post'
+        
+        # Add short hash from key for guaranteed uniqueness
+        key_hash = hashlib.sha256(key.encode('utf-8')).hexdigest()[:8]
+        slug = dt.strftime('%Y%m%d') + '-' + slug_suffix + '-' + key_hash
 
         # Caption full text with fallback to .txt
         caption_full = side.get('caption') or ''
